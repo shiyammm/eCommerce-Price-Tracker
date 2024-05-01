@@ -1,9 +1,13 @@
-import { Button } from '@/components/ui/button';
+import HeroSection from '@/components/HeroSection';
+import Navbar from '@/components/Navbar';
+import TrendingProducts from '@/components/TrendingProducts';
 
 export default function Home() {
   return (
     <main>
-      <Button>Initial Page Setup</Button>
+      <Navbar />
+      <HeroSection />
+      <TrendingProducts />
     </main>
   );
 }
