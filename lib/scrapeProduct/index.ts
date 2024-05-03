@@ -2,7 +2,13 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import extractPrice from '../scraperUtils';
+import {
+  extractPrice,
+  extractCurrencySymbol,
+  extractDiscountPercentage,
+  extractDescription,
+  extractCategory,
+} from '../scraperUtils';
 
 export async function scrapeProductAmazon(url: string) {
   if (!url) return;
@@ -34,11 +40,9 @@ export async function scrapeProductAmazon(url: string) {
     //Extracting each information
     const title = $('#productTitle').text().trim();
     const currentPrice = extractPrice(
-      $('.a-price-whole'),
-      $('.priceTopay span.a-price-whole'),
-      $('a.size.base.a-color-price'),
-      $('.a.button-selected .a-color-base'),
-      $('.a-price.a-text-price'),
+      $('.priceToPay span.a-price-whole'),
+      $('.a.size.base.a-color-price'),
+      $('.a-button-selected .a-color-base'),
     );
 
     const originalPrice = extractPrice(
@@ -46,11 +50,52 @@ export async function scrapeProductAmazon(url: string) {
       $('.a-price.a-text-price span.a-offscreen'),
       $('#listPrice'),
       $('#priceblock_dealprice'),
-      $('.a-price a-text-price .a-offscreen'),
       $('.a-size-base.a-color-price'),
     );
 
-    console.log({ title, currentPrice, originalPrice });
+    const outOfStock =
+      $('#availability span').text().trim().toLowerCase() ===
+      'currently unavailable';
+
+    const images =
+      $('#imgBlkFront').attr('data-a-dynamic-image') ||
+      $('#landingImage').attr('data-a-dynamic-image') ||
+      '{}';
+
+    const imageUrls = Object.keys(JSON.parse(images));
+
+    const currencySymbol = extractCurrencySymbol($('.a-price-symbol'));
+
+    const discountPercentage = extractDiscountPercentage(
+      $('.savingsPercentage'),
+    );
+
+    const description = extractDescription(
+      $('#feature-bullets ul.a-unordered-list'),
+    );
+
+    const categoryAlt = $('span.nav-a-content img.nav-categ-image');
+
+    // Extract the alt attribute from the img element
+    const altText = categoryAlt.attr('alt') || '';
+
+    const category = extractCategory(altText);
+
+    const rating =
+      $('i.cm-cr-review-stars span.a-icon-alt').text().trim() || '';
+
+    console.log({
+      title,
+      currentPrice,
+      originalPrice,
+      outOfStock,
+      imageUrls,
+      currencySymbol,
+      discountPercentage,
+      description,
+      category,
+      rating,
+    });
   } catch (error: any) {
     throw new Error(`Failed to scrape product : ${error.message}`);
   }
