@@ -84,18 +84,29 @@ export async function scrapeProductAmazon(url: string) {
     const rating =
       $('i.cm-cr-review-stars span.a-icon-alt').text().trim() || '';
 
-    console.log({
+    // Will add review count, stars,etc...
+
+    const data = {
+      url,
+      currency: currencySymbol || '',
+      image: imageUrls[0],
       title,
-      currentPrice,
-      originalPrice,
-      outOfStock,
-      imageUrls,
-      currencySymbol,
-      discountPercentage,
+      currentPrice: currentPrice || originalPrice,
+      originalPrice: originalPrice || currentPrice,
+      priceHistory: [],
+      discountRate: discountPercentage,
+      category: category,
+      rating: rating,
+      reviewsCount: 100,
+      stars: 4.5,
+      isOutOfStock: outOfStock,
       description,
-      category,
-      rating,
-    });
+      lowestPrice: currentPrice || originalPrice,
+      highestPrice: originalPrice || currentPrice,
+      averagePrice: currentPrice || originalPrice,
+    };
+
+    return data;
   } catch (error: any) {
     throw new Error(`Failed to scrape product : ${error.message}`);
   }
