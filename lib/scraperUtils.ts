@@ -1,9 +1,20 @@
 export function extractPrice(...elements: any) {
-  for (let element of elements) {
-    const productPrice = element.text().trim();
+  for (const element of elements) {
+    const priceText = element.text().trim();
 
-    if (productPrice) return productPrice.replace(/[^0-9.,]/g, '');
+    if (priceText) {
+      const cleanPrice = priceText.replace(/[^\d.,]/g, '');
+
+      let firstPrice;
+
+      if (cleanPrice) {
+        firstPrice = cleanPrice.match(/\d{1,3}(?:,\d{3})*(?:\.\d{2})?/)?.[0]; // Update the regular expression to handle commas
+      }
+
+      return firstPrice || cleanPrice;
+    }
   }
+
   return '';
 }
 
