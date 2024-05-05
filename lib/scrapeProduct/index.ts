@@ -70,9 +70,7 @@ export async function scrapeProductAmazon(url: string) {
       $('.savingsPercentage'),
     );
 
-    const description = extractDescription(
-      $('#feature-bullets ul.a-unordered-list'),
-    );
+    const description = extractDescription($);
 
     const categoryAlt = $('span.nav-a-content img.nav-categ-image');
 
@@ -91,8 +89,8 @@ export async function scrapeProductAmazon(url: string) {
       currency: currencySymbol || '',
       image: imageUrls[0],
       title,
-      currentPrice: currentPrice || originalPrice,
-      originalPrice: originalPrice || currentPrice,
+      currentPrice: Number(currentPrice) || Number(originalPrice),
+      originalPrice: Number(originalPrice) || Number(currentPrice),
       priceHistory: [],
       discountRate: discountPercentage,
       category: category,
@@ -101,9 +99,9 @@ export async function scrapeProductAmazon(url: string) {
       stars: 4.5,
       isOutOfStock: outOfStock,
       description,
-      lowestPrice: currentPrice || originalPrice,
-      highestPrice: originalPrice || currentPrice,
-      averagePrice: currentPrice || originalPrice,
+      lowestPrice: Number(currentPrice) || Number(originalPrice),
+      highestPrice: Number(originalPrice) || Number(currentPrice),
+      averagePrice: Number(currentPrice) || Number(originalPrice),
     };
 
     return data;
