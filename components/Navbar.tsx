@@ -1,4 +1,5 @@
 import React from 'react';
+import { ModeToggle } from '@/components/ui/Theme';
 
 const Navbar = () => {
   const NavLinks = ['Home', 'Search', 'Favorites', 'Cart'];
@@ -13,6 +14,9 @@ const Navbar = () => {
           <li>{link}</li>
         </ul>
       ))}
+      <div>
+        <ModeToggle />
+      </div>
     </header>
   );
 };
