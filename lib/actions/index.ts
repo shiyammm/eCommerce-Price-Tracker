@@ -8,6 +8,8 @@ import {
   getHighestPrice,
   getLowestPrice,
 } from '../scraperUtils';
+import { User } from '@/types';
+import { generateEmailContent } from '../nodemailer';
 
 export async function scrapeAndStoreProduct(productUrl: string) {
   if (!productUrl) return;
@@ -74,4 +76,42 @@ export async function getAllProducts() {
   } catch (error) {
     console.log(error);
   }
+}
+
+export async function getSimilarProduct(productId: string) {
+  try {
+    connectToDB();
+
+    const CurrentProduct = await Product.findById(productId);
+
+    if (!CurrentProduct) return null;
+
+    const similarProduct = await Product.find({
+      _id: { $ne: productId },
+    }).limit(3);
+
+    return similarProduct;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function addUserEmail(productId: string, userEmail: string) {
+  try {
+    const product = await Product.findById(productId);
+
+    if (!product) return null;
+
+    const userExists = product.users.some(
+      (user: User) => user.email === userEmail,
+    );
+
+    if (!userExists) {
+      product.users.push({ email: userEmail });
+
+      await product.save();
+
+      const emailContent = generateEmailContent(product, 'WELCOME');
+    }
+  } catch (error) {}
 }
