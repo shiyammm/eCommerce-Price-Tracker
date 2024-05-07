@@ -1,4 +1,5 @@
 'use server';
+
 import { revalidatePath } from 'next/cache';
 import Product from '../models/product.model';
 import { connectToDB } from '../mongoose';
@@ -9,7 +10,7 @@ import {
   getLowestPrice,
 } from '../scraperUtils';
 import { User } from '@/types';
-import { generateEmailContent } from '../nodemailer';
+import { generateEmailBody, sendEmail } from '../nodemailer';
 
 export async function scrapeAndStoreProduct(productUrl: string) {
   if (!productUrl) return;
@@ -96,11 +97,14 @@ export async function getSimilarProduct(productId: string) {
   }
 }
 
-export async function addUserEmail(productId: string, userEmail: string) {
+export async function addUserEmailToProduct(
+  productId: string,
+  userEmail: string,
+) {
   try {
     const product = await Product.findById(productId);
 
-    if (!product) return null;
+    if (!product) return;
 
     const userExists = product.users.some(
       (user: User) => user.email === userEmail,
@@ -111,7 +115,11 @@ export async function addUserEmail(productId: string, userEmail: string) {
 
       await product.save();
 
-      const emailContent = generateEmailContent(product, 'WELCOME');
+      const emailContent = await generateEmailBody(product, 'WELCOME');
+
+      await sendEmail(emailContent, [userEmail]);
     }
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 }

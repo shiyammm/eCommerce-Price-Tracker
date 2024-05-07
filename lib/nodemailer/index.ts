@@ -1,19 +1,21 @@
-import { EmailProductInfo, NotificationType } from '@/types';
+'use server';
+
+import { EmailContent, EmailProductInfo, NotificationType } from '@/types';
 import nodemailer from 'nodemailer';
 
-export const THRESHOLD_PERCENTAGE = 40;
-
-export const Notification = {
+const Notification = {
   WELCOME: 'WELCOME',
   CHANGE_OF_STOCK: 'CHANGE_OF_STOCK',
   LOWEST_PRICE: 'LOWEST_PRICE',
   THRESHOLD_MET: 'THRESHOLD_MET',
 };
 
-export const generateEmailContent = (
+export async function generateEmailBody(
   product: EmailProductInfo,
   type: NotificationType,
-) => {
+) {
+  const THRESHOLD_PERCENTAGE = 40;
+  // Shorten the product title
   const shortenedTitle =
     product.title.length > 20
       ? `${product.title.substring(0, 20)}...`
@@ -27,7 +29,7 @@ export const generateEmailContent = (
       subject = `Welcome to Price Tracking for ${shortenedTitle}`;
       body = `
         <div>
-          <h2>Welcome to PriceWise 🚀</h2>
+          <h2>Welcome to PriceWhiz 🚀</h2>
           <p>You are now tracking ${product.title}.</p>
           <p>Here's an example of how you'll receive updates:</p>
           <div style="border: 1px solid #ccc; padding: 10px; background-color: #f8f8f8;">
@@ -74,4 +76,35 @@ export const generateEmailContent = (
     default:
       throw new Error('Invalid notification type.');
   }
+
+  return { subject, body };
+}
+
+const transporter = nodemailer.createTransport({
+  pool: true,
+  service: 'outlook',
+  port: 2525,
+  auth: {
+    user: 'pricewhiz@outlook.com',
+    pass: process.env.EMAIL_PASS,
+  },
+  maxConnections: 1,
+});
+
+export const sendEmail = async (
+  emailContent: EmailContent,
+  sendTo: string[],
+) => {
+  const mailOptions = {
+    from: 'pricewhiz@outlook.com',
+    to: sendTo,
+    html: emailContent.body,
+    subject: emailContent.subject,
+  };
+
+  transporter.sendMail(mailOptions, (error: any, info: any) => {
+    if (error) return console.log(error);
+
+    console.log('Email sent: ', info);
+  });
 };
