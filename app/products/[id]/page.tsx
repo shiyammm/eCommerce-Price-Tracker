@@ -71,7 +71,7 @@ const page = async ({ params: { id } }: Props) => {
       <br />
       <br />
       <br />
-      <TrackButton />
+      <TrackButton productId={id} />
       <div>
         <h1>Similar Products</h1>
         {similarProduct &&

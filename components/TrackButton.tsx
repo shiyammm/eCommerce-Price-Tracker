@@ -3,8 +3,13 @@ import React, { FormEvent, Fragment } from 'react';
 import { useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Input } from '@/components/ui/input';
+import { addUserEmailToProduct } from '@/lib/actions';
 
-const TrackButton = () => {
+interface Props {
+  productId: string;
+}
+
+const TrackButton = ({ productId }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [emailPrompt, setEmailPrompt] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -17,6 +22,7 @@ const TrackButton = () => {
     setIsSubmitting(true);
 
     // Add user
+    await addUserEmailToProduct(productId, emailPrompt);
     setIsSubmitting(false);
     setEmailPrompt('');
     closeModal();
