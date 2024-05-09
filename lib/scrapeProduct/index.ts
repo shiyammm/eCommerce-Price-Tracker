@@ -13,10 +13,6 @@ import {
 export async function scrapeProductAmazon(url: string) {
   if (!url) return;
 
-  // Bright Date implementation
-
-  //curl --proxy brd.superproxy.io:22225 --proxy-user brd-customer-hl_fe7fbf5a-zone-pricewhiz:sp5da5607lxt -k "http://lumtest.com/myip.json"
-
   const username = String(process.env.BRIGHT_DATE_USERNAME);
   const password = String(process.env.BRIGHT_DATE_PASSWORD);
   const port = 22225;
